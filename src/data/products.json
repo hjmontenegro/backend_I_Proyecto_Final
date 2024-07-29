@@ -96,5 +96,13 @@
     "thumbnails": "./thumbnails/CategoriaA/Producto9",
     "description": "Descripcion 9",
     "category": "Categoria F"
+  },
+  {
+    "id": 10,
+    "title": "Producto 10",
+    "code": "00000000010",
+    "price": "101010.10",
+    "status": true,
+    "stock": "1000"
   }
 ]

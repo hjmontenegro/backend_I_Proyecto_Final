@@ -2,7 +2,7 @@ import express from 'express'
 import handlebars from 'express-handlebars'
 import __dirname from './utils.js'
 
-import viewsRouter from './routes/views.routers.js'
+import homeRouter from './routes/home.routers.js'
 import productsRouter from './routes/products.routers.js'
 import cartsRouter from './routes/carts.routers.js'
 
@@ -25,7 +25,7 @@ app.use(express.static(__dirname + '/public'))
 //Ahora toda la logica de las vistas quedan en router
 app.use("/", productsRouter);
 app.use("/", cartsRouter);
-app.use('/', viewsRouter)
+app.use('/', homeRouter)
 
 /*app.listen(PORT, () => {
     console.log(`Server runing on port ${PORT}`)
