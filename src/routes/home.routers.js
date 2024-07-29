@@ -21,4 +21,21 @@ router.get('/' , (req, res) => {
     });
 })
 
+router.get('/realtimeproducts' , (req, res) => {
+
+    fs.readFile('src/data/products.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        const products = JSON.parse(data);
+
+        res.render('realtimeproducts', {
+            products
+        })
+
+    });
+})
+
 export default router
