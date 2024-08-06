@@ -5,6 +5,8 @@ const productNew = document.getElementById('productNew')
 const productList = document.getElementById('productList')
 
 form.addEventListener('submit', e => {
+
+    //alert("Entrando");
     e.preventDefault();
 
     const title = document.getElementById("title").value;
@@ -15,11 +17,13 @@ form.addEventListener('submit', e => {
     const category = document.getElementById("category").value;
     const thumbnail = document.getElementById("thumbnails").value;
     const productComplete = { title, description, code, price, stock, category, thumbnail}
-    console.log(productComplete)
-    socket.emit('product', productComplete)
+    
+    //console.log(productComplete)
+    socket.emit('producto', productComplete)
 })
 
-socket.on('product', data => {
+socket.on('productoLog', data => {
+
     productNew.innerHTML =`
     <table style="border: black 1px solid;">
         <tr>

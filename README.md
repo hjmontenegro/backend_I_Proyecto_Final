@@ -43,3 +43,6 @@ Servicio Rest CRUD Products y Carts.
 
 ### realtimeproducts
 ![realtimeproducts](/pruebas_imagen/SegundaEntrega/realtime.jpg)
+
+### realtimeproducts Producto viajando por socket
+![realtimeproductsmandado](/pruebas_imagen/SegundaEntrega/realtimemandado.jpg)

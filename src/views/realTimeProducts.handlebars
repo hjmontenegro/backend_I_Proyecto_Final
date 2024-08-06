@@ -4,27 +4,26 @@
     <h1>LISTA DE PRODUCTOS</h1>
     <h2>Agregar un producto:</h2>
         <form action="/realtimeproducts" method="POST" id="product">
-            <label>Titulo: </label>
-            <input name="title" id="title">
+            <label>Titulo: </label> 
+            <input name="title" id="title" value="title 11" /> <br/>
             <label >Descripcion: </label>
-            <input name="description" id="description">
+            <input name="description" id="description" value="description 11" /><br/>
             <label >Código: </label>
-            <input name="code" id="code">
+            <input name="code" id="code" value="code 11" /><br/>
             <label >Precio: </label>
-            <input name="price" type="number" id="price">
+            <input name="price" type="number" id="price" value="11.1" /><br/>
             <label >Status: </label>
-            <input name="status" type="radio" value="true" class="status">
+            <input name="status" type="radio" value="true" class="status" checked>
             <label for="true">true</label>
             <input name="status" type="radio" value="" class="status">
-            <label >false</label>
+            <label >false</label><br/>
             <label for="false">Stock: </label>
-            <input name="stock" type="number" id="stock">
+            <input name="stock" type="number" id="stock" value="11" /><br/>
             <label >Categoria: </label>
-            <input name="category" id="category">
+            <input name="category" id="category" value="category 11" /><br/>
             <label >Thumbnails: </label>
-            <input name="thumbnails" id="thumbnails">
+            <input name="thumbnails" id="thumbnails" value=""><br/><br/>
             <input type="submit">
-
         </form>
 
         <div id="productNew"></div>
