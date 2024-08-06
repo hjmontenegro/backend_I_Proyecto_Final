@@ -37,15 +37,17 @@ const httpServer = app.listen(PORT, () => {
 
 const socketServer = new Server(httpServer)
 
-socketServer.on('connection', socket => {
+socketServer.on('connection', socketServer => {
     console.log(`Nuevo cliente conectado`)
 
-    socket.on('producto', data => {
-        console.log(`Dta: ${data}`)
-        /*const id = producto.length > 0 ? producto[producto.length - 1].id + 1 : 1;
-        const products = { id, ...producto}
-        products.unshift(producto);
-        fs.writeFileSync('./database/products.json',JSON.stringify(products, null, '\t'))*/
+    socketServer.on('producto', data => {
+       
+        const id = data.length > 0 ? data[data.length - 1].id + 1 : 1;
+        const products = { id, ...data}
+
+        console.log(`Dta: ${JSON.stringify(products)}`)
+        //products.unshift(data);
+        //fs.writeFileSync('./database/products.json',JSON.stringify(products, null, '\t'))
         socketServer.emit('productoLog', data)
     })
 })
