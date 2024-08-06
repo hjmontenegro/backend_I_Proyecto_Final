@@ -41,6 +41,10 @@ socketServer.on('connection', socket => {
     console.log(`Nuevo cliente conectado`)
 
     socket.on('message', data => {
-        console.log(`Soy la data: ${data}`)
+        const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+        const product = { id, ...data}
+        products.unshift(product);
+        fs.writeFileSync('./database/products.json',JSON.stringify(products, null, '\t'))
+        io.emit('product', data)
     })
 })
