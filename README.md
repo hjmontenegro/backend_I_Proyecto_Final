@@ -42,4 +42,4 @@ Servicio Rest CRUD Products y Carts.
 ![home.handlebar](/pruebas_imagen/SegundaEntrega/home.jpg)
 
 ### realtimeproducts
-![realtimeproducts](/pruebas_imagen/SegundaEntrega/home.jpg)
+![realtimeproducts](/pruebas_imagen/SegundaEntrega/realtime.jpg)
