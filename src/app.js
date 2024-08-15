@@ -1,6 +1,7 @@
 import express from 'express'
+import mongoose from "mongoose";
 import handlebars from 'express-handlebars'
-import __dirname from './utils.js'
+import __dirname from './utils/utils.js'
 
 import homeRouter from './routes/home.routers.js'
 import productsRouter from './routes/products.routers.js'
@@ -13,6 +14,18 @@ const PORT = 8080
 
 app.use(express.json())
 app.use(express.urlencoded({ extended : true }))
+
+//Conexión a la base de datos
+mongoose
+  .connect(
+    "mongodb+srv://hjmontenegro:gtFwcvQwwQyvxcFx@cluster0.ruii4i2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  )
+  .then(() => {
+    console.log("Conectado a la Base de Datos.");
+  })
+  .catch((error) =>
+    console.error("Error: No se pudo conectar con la base de datos", error)
+  );
 
 //Configurar Handlebars para leer el conrtenido de los endpoint
 app.engine('handlebars', handlebars.engine())
@@ -35,7 +48,7 @@ const httpServer = app.listen(PORT, () => {
     console.log(`Server runing on port ${PORT}`)
 })
 
-const socketServer = new Server(httpServer)
+export const socketServer = new Server(httpServer)
 
 socketServer.on('connection', socketServer => {
     console.log(`Nuevo cliente conectado`)

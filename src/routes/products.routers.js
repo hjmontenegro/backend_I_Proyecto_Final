@@ -1,12 +1,27 @@
 import express from 'express'
-import fs from 'fs'
+import productsModel from "../models/products.model.js";
+
+import { getNextId } from "../utils/utils.js";
+
+import { socketServer } from "../app.js";
 
 const router = express.Router()
-//const fs = require('fs');
 
 const products = [];
 
-router.get('/api/products', (req, res) => {
+
+router.use(async (req, res, next) => {
+    try {
+      const loadedProducts = await productsModel.find({});
+      req.products = loadedProducts;
+      next();
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: "Error: Al cargar los productos." });
+    }
+  });
+
+/*router.get('/api/products', (req, res) => {
 
     // Lee el archivo "productos.json"
     fs.readFile('src/data/products.json', 'utf8', (err, data) => {
@@ -24,9 +39,9 @@ router.get('/api/products', (req, res) => {
             res.json(products);
         }
     });
-});
+});*/
 
-router.get('/api/products/:pid', (req, res) => {
+/*router.get('/api/products/:pid', (req, res) => {
 
     // Lee el archivo "productos.json"
     fs.readFile('src/data/products.json', 'utf8', (err, data) => {
@@ -45,42 +60,56 @@ router.get('/api/products/:pid', (req, res) => {
             res.status(404).json({ error: 'Product not found' });
         }
     });
-});
+});*/
 
 // Ruta para agregar un nuevo producto
 
-router.post('/api/products', (req, res) => {
+router.post('/api/products', async (req, res) => {
+    try {
+        let { title, description, code, price, stock, category } = req.body;
 
-    const { title, description, code, price, status, stock, category } = req.body;
-
-    // Lee el archivo "productos.json"
-    fs.readFile('src/data/products.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
+        if (ValidarProductos(req.body))
+        {
+            return res.status(400).json({
+                msg: "Falta algún campo obligatorio o alguno de los campos tiene el tipo de dato incorrecto.",
+            });        
         }
+
+        price = parseFloat(price);
+        stock = parseInt(stock);
+
+        let status = stock > 0;
         
-        const products = JSON.parse(data);
-        const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+        const thumbnail = "";
 
-        if (req.body.status) req.body.status = true;
-        const newProduct = { id, title, description, code, price, status: status || true, stock, category };
-
-        products.push(newProduct);
-
-        // Escribe los productos actualizados en el archivo "productos.json"
-        fs.writeFile('src/data/products.json', JSON.stringify(products, null, 2), err => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-
-            res.json(newProduct);
+        const newProduct = new productsModel({
+            id: await getNextId(productsModel),
+            title,
+            description,
+            code,
+            price,
+            status,
+            stock,
+            category,
+            thumbnail,
         });
-    });
+    
+        await newProduct.save();
+
+        socketServer.emit("Product Add", newProduct);
+        res.status(201).json({
+            msg: `Producto agregado exitosamente con id ${newProduct.id}`,
+            newProduct
+        });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error: Al guardar el producto.", error });
+  }
+
+    
 });
 
-router.put('/api/products/:pid', (req, res) => {
+/*router.put('/api/products/:pid', (req, res) => {
 
     // Lee el archivo "productos.json"
     fs.readFile('src/data/products.json', 'utf8', (err, data) => {
@@ -127,9 +156,9 @@ router.put('/api/products/:pid', (req, res) => {
             }
         });
     });
-});
+});*/
 
-router.delete('/api/products/:pid', (req, res) => {
+/*router.delete('/api/products/:pid', (req, res) => {
 
     console.log(req.body.title)
 
@@ -154,11 +183,18 @@ router.delete('/api/products/:pid', (req, res) => {
             res.json({ message: `Tarea con id ${id} eliminada correctamente` })
         });
     });
-});
+});*/
 
 function ValidarProductos (product) {
 
-    if (product.title && product.description && product.code && product.price && product.stock && product.category ) {
+    if (
+        (product.title !== undefined && typeof product.title !== "string") ||
+        (product.description !== undefined && typeof product.description !== "string") ||
+        (product.code !== undefined && (typeof product.code !== "string")) ||
+        (product.price !== undefined && (typeof product.price !== "number" || product.price < 1)) ||
+        (product.stock !== undefined && (typeof product.stock !== "number" || product.stock < 0)) ||
+        (product.category !== undefined && typeof product.category !== "string")
+      ){
         return false;
     }
     
