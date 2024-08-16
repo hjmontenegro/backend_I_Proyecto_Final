@@ -21,52 +21,61 @@ router.use(async (req, res, next) => {
     }
   });
 
-/*router.get('/api/products', (req, res) => {
+router.get('/api/products', async (req, res) => {
+    try {
 
-    // Lee el archivo "productos.json"
-    fs.readFile('src/data/products.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
+        const products = await productsModel.find({});
+        let limit = parseInt(req.query.limit);
+        const page = parseInt(req.query.page);
+        const sort = req.query.sort;
+        const query = req.query.query;
+
+        let productsLimit = products;
+
+        if (isNaN(limit)) {
+            limit = 10;
+        } 
+
+        if (limit <= 0) {
+            res.status(500).json({ msg: "Error: Limit no puede ser un numero negativo." });
         }
+        
+        productsLimit = products.slice(0, limit);
 
-        const products = JSON.parse(data);
-        const limit = req.query.limit;
 
-        if (limit) {
-            res.json(products.slice(0, limit));
+
+        res.status(200).json({
+            msg: `Mostrando los productos: Limit ${limit}`, productsLimit
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error: Al obtener los productos." });
+    }
+});
+
+router.get('/api/products/:pid', async (req, res) => {
+    try {
+        const idProducto = req.params.pid;
+        const productBuscado = await productsModel.findOne({ id: idProducto });
+
+        if (productBuscado) {
+            res.status(200).json({
+                msg: `MFiltro de  producto con id ${idProducto}`,
+                productBuscado,
+              });
         } else {
-            res.json(products);
+            res.status(404).json({ error: 'Producto no filtrado' });
         }
-    });
-});*/
-
-/*router.get('/api/products/:pid', (req, res) => {
-
-    // Lee el archivo "productos.json"
-    fs.readFile('src/data/products.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        const products = JSON.parse(data);
-        const id = req.params.pid;
-        const product = products.find(product => product.id === parseInt(id));
-
-        if (product) {
-            res.json(product);
-        } else {
-            res.status(404).json({ error: 'Product not found' });
-        }
-    });
-});*/
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error: Al filtrar el producto por numero de Id." });
+    }
+});
 
 // Ruta para agregar un nuevo producto
-
 router.post('/api/products', async (req, res) => {
     try {
-        let { title, description, code, price, stock, category } = req.body;
+        let { title, description, code, price, stock, category, thumbnail } = req.body;
 
         if (ValidarProductos(req.body))
         {
@@ -80,7 +89,7 @@ router.post('/api/products', async (req, res) => {
 
         let status = stock > 0;
         
-        const thumbnail = "";
+        //thumbnail = req.body.thumbnail;
 
         const newProduct = new productsModel({
             id: await getNextId(productsModel),
@@ -109,81 +118,66 @@ router.post('/api/products', async (req, res) => {
     
 });
 
-/*router.put('/api/products/:pid', (req, res) => {
+router.put('/api/products/:pid', async (req, res) => {
 
-    // Lee el archivo "productos.json"
-    fs.readFile('src/data/products.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
+    try {
+        const idProducto = req.params.pid;
+        let { title, description, code, price, stock, category, thumbnail } = req.body;
+
+        const updateData = {
+            ...(title && { title }),
+            ...(description && { description }),
+            ...(code && { code: parseInt(code) }),
+            ...(price && { price: parseFloat(price) }),
+            ...(stock !== undefined && { stock: parseInt(stock) }),
+            status: stock > 0,
+            ...(category && { category }),
+            ...(thumbnail && { thumbnail }),
+        };
+      
+        const updatedProduct = await productsModel.findOneAndUpdate(
+            { id: idProducto },
+            updateData,
+            { new: true }
+        );
+
+        if (updatedProduct) {
+            socketServer.emit("Product Update", updatedProduct);
+            res.status(200).json({
+              msg: `Producto modificado correctamente con el id ${idProducto}`,
+              productoModificado: updatedProduct,
+            });
+        } else {
+            res.status(404).json({ msg: `No se encuentra el producto con id ${idProducto}` });
         }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Error: Al modificar el producto." });
+    }
+});
+
+router.delete('/api/products/:pid', async (req, res) => {
+    try {
         
-        const products = JSON.parse(data);
-        const id = parseInt(req.params.pid);
-        //const newProduct = { id, title, description, code, price, status, stock, category };
+        const idProducto = parseInt(req.params.pid);
+        const deletedProduct = await productsModel.findOneAndDelete({ id: idProducto });
 
-        
+        if (deletedProduct) {
+            socketServer.emit("Product Deleted", deletedProduct);
+            res.status(200).json({
+              msg: `Se eliminó el producto con id ${idProducto}`,
+              productoAEliminar: deletedProduct,
+            });
+          } else {
+            res.status(404).json({ msg: "No se encuentra el producto con dicho id" });
+          }
 
-        if (ValidarProductos(req.body))
-        {
-            res.status(404).json({ message: "Todos los datos son oblgatorios" });
-
-        }
-        else
-        {
-            const product = products.find((prod) => prod.id === id);
-            if (product) {
-                
-                product.title = req.body.title
-                product.description = req.body.description
-                product.code = req.body.code
-                product.price = req.body.price
-                product.status = req.body.status;
-                product.stock = req.body.stock
-                product.category = req.body.category
-
-                //res.json(req.body.status)
-            } else {
-                res.status(404).json({ message: "Tarea no encontrada" })
-            }
-
-            res.json(product);
-        }
-        fs.writeFile('src/data/products.json', JSON.stringify(products, null, 2), err => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-        });
-    });
-});*/
-
-/*router.delete('/api/products/:pid', (req, res) => {
-
-    console.log(req.body.title)
-
-    // Lee el archivo "productos.json"
-    fs.readFile('src/data/products.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-        
-        const products = JSON.parse(data);
-        const id = parseInt(req.params.pid);
-
-        const product = products.filter((prod) => prod.id !==  id)
-
-        fs.writeFile('src/data/products.json', JSON.stringify(product, null, 2), err => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-
-            res.json({ message: `Tarea con id ${id} eliminada correctamente` })
-        });
-    });
-});*/
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: `Error: Al eliminar el producto con id ${idProducto}.` });
+      }
+});
 
 function ValidarProductos (product) {
 

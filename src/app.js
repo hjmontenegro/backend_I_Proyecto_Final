@@ -29,7 +29,7 @@ mongoose
 
 //Configurar Handlebars para leer el conrtenido de los endpoint
 app.engine('handlebars', handlebars.engine())
-app.set('views', __dirname + '/views') // Todo
+app.set('views', __dirname + '/../views') // Todo
 app.set('view engine', 'handlebars')
 
 //Utilizar recursos estaticos
