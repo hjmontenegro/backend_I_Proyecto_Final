@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from "mongoose";
 import handlebars from 'express-handlebars'
+
 import __dirname from './utils/utils.js'
 
 import homeRouter from './routes/home.routers.js'
@@ -8,6 +9,8 @@ import productsRouter from './routes/products.routers.js'
 import cartsRouter from './routes/carts.routers.js'
 
 import { Server } from 'socket.io'
+import { helpers } from "./utils/utils.js";
+
 const app = express()
 const PORT = 8080
 
@@ -27,17 +30,26 @@ mongoose
     console.error("Error: No se pudo conectar con la base de datos", error)
   );
 
+  // Crear instancia de Handlebars con helpers personalizados
+const hbs = handlebars.create({
+  helpers: helpers,
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+  },
+});
+
 //Configurar Handlebars para leer el conrtenido de los endpoint
-app.engine('handlebars', handlebars.engine())
+app.engine('handlebars', hbs.engine)
 app.set('views', __dirname + '/../views') // Todo
+//console.log(__dirname + '../views')
 app.set('view engine', 'handlebars')
 
 //Utilizar recursos estaticos
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/../public'))
 
 //Ahora toda la logica de las vistas quedan en router
-app.use("/", productsRouter);
-app.use("/", cartsRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/carts", cartsRouter);
 app.use('/', homeRouter)
 
 /*app.listen(PORT, () => {
