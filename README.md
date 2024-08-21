@@ -4,11 +4,11 @@
 
 Servicio Rest CRUD Products y Carts.
 
-# Primera Entrega
+# Entrega Final
 
 ## Imagenes Pruebas Productos
 
-### Get y limit Products
+### Get Products por limit
 ![Get y limit Products](/pruebas_imagen/Get_productos_limit.jpg)
 
 ### Get Products por ID
