@@ -21,7 +21,7 @@ router.use(async (req, res, next) => {
     }
   });
 
-router.get('/api/products', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
 
         const products = await productsModel.find({});
@@ -42,8 +42,6 @@ router.get('/api/products', async (req, res) => {
         
         productsLimit = products.slice(0, limit);
 
-
-
         res.status(200).json({
             msg: `Mostrando los productos: Limit ${limit}`, productsLimit
         });
@@ -53,7 +51,7 @@ router.get('/api/products', async (req, res) => {
     }
 });
 
-router.get('/api/products/:pid', async (req, res) => {
+router.get('/:pid', async (req, res) => {
     try {
         const idProducto = req.params.pid;
         const productBuscado = await productsModel.findOne({ id: idProducto });
@@ -73,7 +71,7 @@ router.get('/api/products/:pid', async (req, res) => {
 });
 
 // Ruta para agregar un nuevo producto
-router.post('/api/products', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         let { title, description, code, price, stock, category, thumbnail } = req.body;
 
@@ -89,10 +87,8 @@ router.post('/api/products', async (req, res) => {
 
         let status = stock > 0;
         
-        //thumbnail = req.body.thumbnail;
-
         const newProduct = new productsModel({
-            id: await getNextId(productsModel),
+            id: await getNextId(),
             title,
             description,
             code,
@@ -105,7 +101,8 @@ router.post('/api/products', async (req, res) => {
     
         await newProduct.save();
 
-        socketServer.emit("Product Add", newProduct);
+        socketServer.emit("productoAdd", newProduct);
+
         res.status(201).json({
             msg: `Producto agregado exitosamente con id ${newProduct.id}`,
             newProduct
@@ -118,7 +115,7 @@ router.post('/api/products', async (req, res) => {
     
 });
 
-router.put('/api/products/:pid', async (req, res) => {
+router.put('/:pid', async (req, res) => {
 
     try {
         const idProducto = req.params.pid;
@@ -157,7 +154,7 @@ router.put('/api/products/:pid', async (req, res) => {
     }
 });
 
-router.delete('/api/products/:pid', async (req, res) => {
+router.delete('/:pid', async (req, res) => {
     try {
         
         const idProducto = parseInt(req.params.pid);

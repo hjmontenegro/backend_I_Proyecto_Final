@@ -7,19 +7,6 @@ const __dirname = dirname(__filename)
 
 export default __dirname
 
-//Crea una funcion para cambiar el formato de la fecha AAA/MM/DD => DD/MM/AAAA
-
-export function cambiarFormato(){
-
-}
-
-//Crea una funcion para cambiar el formato de la moneda USD => ARS
-
-export function cambiarFormatoMoneda(){
-    
-}
-
-
 //getNextId para productos
 import productsModel from "../models/products.model.js"; // Ajusta la ruta según la ubicación de tu modelo
 
@@ -36,6 +23,7 @@ export async function getNextId() {
     throw error;
   }
 }
+
 
 import cartsModel from "../models/carts.model.js"; // Ajusta la ruta según la ubicación de tu modelo
 
