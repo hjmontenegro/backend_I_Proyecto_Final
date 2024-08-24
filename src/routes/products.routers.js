@@ -127,7 +127,7 @@ router.put('/:pid', async (req, res) => {
             ...(code && { code: parseInt(code) }),
             ...(price && { price: parseFloat(price) }),
             ...(stock !== undefined && { stock: parseInt(stock) }),
-            status: stock > 0,
+            ...(stock !== undefined && { status: parseInt(stock) > 0 }),
             ...(category && { category }),
             ...(thumbnail && { thumbnail }),
         };
@@ -141,7 +141,7 @@ router.put('/:pid', async (req, res) => {
         if (updatedProduct) {
             socketServer.emit("Product Update", updatedProduct);
             res.status(200).json({
-              msg: `Producto modificado correctamente con el id ${idProducto}`,
+              msg: `Producto modificado correctamente con el id ${stock}`,
               productoModificado: updatedProduct,
             });
         } else {

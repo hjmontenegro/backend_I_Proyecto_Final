@@ -1,7 +1,7 @@
 import express from 'express'
 import mongoose from "mongoose";
 import handlebars from 'express-handlebars'
-
+import path from "path";
 import __dirname from './utils/utils.js'
 
 import homeRouter from './routes/home.routers.js'
@@ -44,8 +44,13 @@ app.set('views', __dirname + '/../views') // Todo
 //console.log(__dirname + '../views')
 app.set('view engine', 'handlebars')
 
+
+
 //Utilizar recursos estaticos
 app.use(express.static(__dirname + '/../public'))
+app.use('/jquery/js', express.static(__dirname + '/node_modules/jquery/dist'));
+app.use('/bootstrap/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
+app.use('/bootstrap/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
 
 //Ahora toda la logica de las vistas quedan en router
 app.use("/api/products", productsRouter);
