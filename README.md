@@ -34,15 +34,12 @@ Servicio Rest CRUD Products y Carts.
 ### Put Producto en Carts
 ![Post Products](/pruebas_imagen/Put_Cart_add.jpg)
 
-# Segunda Entrega - Websockets
 
-## Imagenes Pruebas Productos
-
-### home.handlebar
-![home.handlebar](/pruebas_imagen/SegundaEntrega/home.jpg)
+### Todos los productos - Paginado
+![home.handlebar](/pruebas_imagen/todos.jpg)
 
 ### realtimeproducts
-![realtimeproducts](/pruebas_imagen/SegundaEntrega/realtime.jpg)
+![realtimeproducts](/pruebas_imagen/realtime.jpg)
 
-### realtimeproducts Producto viajando por socket
-![realtimeproductsmandado](/pruebas_imagen/SegundaEntrega/realtimemandado.jpg)
+### rproducto individual
+![realtimeproductsmandado](/pruebas_imagen/productoindividual.jpg)
