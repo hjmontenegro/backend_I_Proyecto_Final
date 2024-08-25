@@ -7,7 +7,6 @@ import { getNextIdC } from '../utils/utils.js';
 
 
 const router = express.Router();
-//const fs = require('fs');
 
 router.post('/', async (req, res) => {
 
@@ -35,16 +34,22 @@ router.get('/:cid', async (req, res) => {
 
         const idCart = req.params.cid;
 
-        const cartBuscado = await cartsModel.findOne({ id: idCart });
+        const cartBuscado = await cartsModel.findOne({ id: idCart }).populate('products.product');
 
-        if (cartBuscado) {
+        if (!cartBuscado) {
+            return res.status(200).json({ products: [] });
+        }
+
+        res.json(cartBuscado.toObject());
+
+        /*if (cartBuscado) {
             res.status(200).json({
                 msg: `Filtro de Cart con id ${idCart}`,
                 cartBuscado,
               });
         } else {
             res.status(404).json({ error: 'Producto no filtrado' });
-        }
+        }*/
 
     } catch (error) {
         console.log(error);
@@ -77,9 +82,11 @@ router.put('/:cid/product/:pid', async (req, res) => {
                 } else {
                     cartBuscado.products.push({ product: productBuscado._id, quantity: 1 });
                 }
-        
-                await cartBuscado.save();
                 
+                productBuscado.stock -= 1;
+
+                await cartBuscado.save();
+                await productBuscado.save();
 
                 res.status(200).json({
                     msg: `Se agrega el producto al Carrito`,

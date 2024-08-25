@@ -1,7 +1,7 @@
 import express from 'express'
 
-//import cartsModel from "../models/carts.model.js";
-import productsModel from "../models/products.model.js"; 
+import cartsModel from "../models/carts.model.js";
+import productsModel from "../models/products.model.js";
 
 const router = express.Router()
 
@@ -48,7 +48,7 @@ router.get('/realtimeproducts' , async (req, res) => {
         limit = limit > 10 ? 10 : limit;
         const sort = req.query.sort;
         const category = req.query.category;
-    
+
         let filter = {};
         if (category) {
             filter.category = category;
@@ -71,8 +71,9 @@ router.get('/realtimeproducts' , async (req, res) => {
         }
     
         // Obtener todas las categorías para el filtro
+        const idCart = 1;
         const allCategories = await productsModel.distinct("category");
-    
+
         result.sort = sort;
         result.category = category;
         result.categories = allCategories;
@@ -89,14 +90,29 @@ router.get('/realtimeproducts' , async (req, res) => {
             }${category ? `&category=${category}` : ""}`
           : "";
         result.isValid = !(page <= 0 || page > result.totalPages);
+        
+
+        result.cantidad = 0;
+        
             
-        console.log(result)
-        res.render("realtimeproducts", result);
+        
+
+        res.render("realtimeproducts", result );
 
     } catch (error) {
         console.log(error);
         res.status(500).json({ msg: "Error al cargar los productos." });
     }
-})
+});
 
-export default router
+/*const router = express.Router();
+
+router.get('/', (req, res) => {
+    res.render('home');
+});
+
+router.get('/realtimeproducts', (req, res) => {
+    res.render('realTimeProducts');
+});*/
+
+export default router;

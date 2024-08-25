@@ -2,113 +2,73 @@
 const socket = io();
 
 
-// Función para crear un nuevo carrito
-const createNewCart = async () => {
-  try {
-    const response = await fetch("/api/carts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem("cartId", data.newCart._id);
-      socket.emit("cartId", data.newCart._id);
-      tostada("!Bienvenido! Tu carrito te espera");
-      console.log(`Nuevo carrito creado con ID: ${data.newCart._id}`);
-      return data.newCart._id;
-    } else {
-      console.error("Error al crear el carrito:", response.statusText);
-      return null;
-    }
-  } catch (error) {
-    console.error("Error en la solicitud:", error);
-    return null;
+function updateCartList(cart) {
+  const cartList = document.getElementById('cart-items');
+  const emptyCartMessage = document.getElementById('empty-cart');
+  if (!cartList) {
+      console.error('Cart list element not found');
+      return;
   }
-};
+  cartList.innerHTML = ''; // Limpiar lista de carritos
 
-// Verificar si el ID del carrito ya está en localStorage
-const getCartId = async () => {
-  let cartId = localStorage.getItem("cartId");
+  console.log("Armando carrito" + cart.products);
 
-  if (!cartId) {
-    cartId = await createNewCart();
+  if (!cart || !cart.products || cart.products.length === 0) {
+      emptyCartMessage.style.display = 'block';
+  } else {
+      emptyCartMessage.style.display = 'none';
+      cart.products.forEach(item => {
+          const product = item.product;
+          const cartItem = document.createElement('li');
+          cartItem.className = 'list-group-item';
+          cartItem.id = `cart-${product._id}`;
+          cartItem.innerHTML = `
+              <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                      <strong>Title:</strong> ${product.title || 'undefined'} <br>
+                      <strong>Quantity:</strong> <span id="cart-quantity-${product._id}">${item.quantity}</span>
+                  </div>
+                  <div>
+                      <button class="btn btn-sm btn-danger" onclick="promptRemoveFromCart('${product._id}')">Remove</button>
+                  </div>
+              </div>`;
+          cartList.appendChild(cartItem);
+      });
   }
-  socket.emit("cartId", cartId);
-
-  return cartId;
-};
-
-//Función de cantidad total en el carrito para obtener el cart count.
-const getQT = async () => {
-  let cartId = localStorage.getItem("cartId");
-  try {
-    const response = await fetch(`/api/carts/${cartId}/QT`);
-    if (response.ok) {
-      const data = await response.json();
-      cartCount.innerText = data.totalProductos;
-    } else {
-      console.error(`Error al cargar QT: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-
-const cartCount = document.getElementById("cartCount");
-if (cartCount) {
-  getQT();
 }
 
-// Escuchar actualizaciones de productos desde el servidor
-socket.on("Cart Update", (updatedCart) => {
-  console.log("Carrito actualizado:", updatedCart);
-  const cartCount = document.getElementById("cartCount");
-  if (cartCount) {
-    getQT();
-  }
-});
 
-// Función para actualizar el enlace del carrito
-const updateCartLink = async () => {
-  const cartId = await getCartId();
-  if (cartId) {
-    const cartLink = document.getElementById("cartLink");
-    cartLink.href = `/carts/${cartId}`;
-    console.log(`Carrito ya existente con ID: ${cartId}`);
-  }
-};
 
 // Función para agregar un producto al carrito
 const addToCart = async (productId) => {
-  const cartId = await getCartId();
-  if (cartId) {
-    try {
-      const response = await fetch(
-        `/api/carts/${cartId}/product/${productId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ productId }),
-        }
-      );
-
-      if (response.ok) {
-        tostada("Producto agreado al carrito.");
-        socket.emit("Product Update", productId);
-      } else {
-        throw new Error("No se pudo agregar el producto al carrito");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      tostada("Error al agregar el producto al carrito");
+fetch(`/api/carts/1/product/${productId}`, {
+    method: 'PUT',
+    headers: {
+        'Content-Type': 'application/json'
     }
-  }
+})
+.then(response => response.json())
+.then(cart => {
+    console.log('Product added to cart:', cart);
+    //socket.emit('cartUpdated', cart);
+    fetch('/api/carts/1')
+      .then(response => response.json())
+      .then(cart => {
+          if (cart) {
+              updateCartList(cart);
+          } else {
+              updateCartList({ products: [] });
+          }
+      })
+})
+.catch(err => console.error('Error adding product to cart:', err));
 };
+
+
+
+socket.on('cartUpdated', (cart) => {
+  updateCartList(cart);
+});
 
 //agregar productos al carrito
 socket.on("ProductAdd", async (data) => {
@@ -163,14 +123,29 @@ socket.on("Product Update", (updatedProduct) => {
   }
 });
 
+//Alertas
+function promptAddToCart(productId) {
+  return addToCart(productId, parseInt(productId));
+}
+
 // Añadir eventos a los botones de "Agregar al Carrito"
 document.addEventListener("DOMContentLoaded", () => {
-  updateCartLink();
-
+  //updateCartLink();
+  //window.Swal = Swal;
   document.querySelectorAll(".add-to-cart").forEach((button) => {
     button.addEventListener("click", () => {
       const productId = button.getAttribute("data-product-id");
-      addToCart(productId);
+      promptAddToCart(productId);      
     });
   });
+  fetch('/api/carts/1')
+  .then(response => response.json())
+  .then(cart => {
+      if (cart) {
+          updateCartList(cart);
+      } else {
+          updateCartList({ products: [] });
+      }
+  })
+  .catch(err => console.error('Error fetching cart:', err));
 });

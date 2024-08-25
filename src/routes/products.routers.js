@@ -139,7 +139,7 @@ router.put('/:pid', async (req, res) => {
         );
 
         if (updatedProduct) {
-            socketServer.emit("Product Update", updatedProduct);
+            socketServer.emit("productoAdd", updatedProduct);
             res.status(200).json({
               msg: `Producto modificado correctamente con el id ${stock}`,
               productoModificado: updatedProduct,

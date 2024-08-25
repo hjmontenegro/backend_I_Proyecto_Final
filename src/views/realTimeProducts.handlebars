@@ -1,80 +1,90 @@
 <div>
   <h1>Venta de Productos Gamer</h1>
   <br />
-  <div class="cartIcon">
+  <!--<div class="cartIcon">
     Carrito
     <a href="#" id="cartLink">
       <i class='bx bx-cart '></i>
-      <p id="cartCount">0</p>
+      <p id="cartCount">{{ cantidad }}</p>
     </a>
-  </div>
-
-  <h2>Lista de Productos</h2>
-  {{#if isValid}}
-
-  <div class="container-fluid">
+  </div>-->
+  <div class="container">
     <div class="row">
-      <form method="get" action="/realtimeproducts">
-        <label for="sort">Ordenar por precio:</label>
-        <select class="form-select" name="sort" id="sort" onchange="this.form.submit()">
-          <option value="" {{#unless sort}}selected{{/unless}}>Sin Orden</option>
-          <option value="asc" {{#if (eq sort 'asc')}}selected{{/if}}>Ascendente</option>
-          <option value="desc" {{#if (eq sort 'desc')}}selected{{/if}}>Descendente</option>
-        </select>
+        <!-- Productos -->
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-12">
+            <h2>Lista de Productos</h2>
+            {{#if isValid}}
+              <form method="get" action="/realtimeproducts">
+                <label for="sort">Ordenar por precio:</label>
+                <select class="form-select" name="sort" id="sort" onchange="this.form.submit()">
+                  <option value="" {{#unless sort}}selected{{/unless}}>Sin Orden</option>
+                  <option value="asc" {{#if (eq sort 'asc')}}selected{{/if}}>Ascendente</option>
+                  <option value="desc" {{#if (eq sort 'desc')}}selected{{/if}}>Descendente</option>
+                </select>
 
-        <label for="category">Filtrar por categoría:</label>
-        <select class="form-select" name="category" id="category" onchange="this.form.submit()">
-          <option value="" {{#unless category}}selected{{/unless}}>Todas las Categorías</option>
-          {{#each categories}}
-          <option value="{{this}}" {{#if (eq ../category this)}}selected{{/if}}>{{this}}</option>
-          {{/each}}
-        </select>
-      </form>
-    </div>
-  </div>
-  <div class="container-fluid">
-     <div class="row">
+                <label for="category">Filtrar por categoría:</label>
+                <select class="form-select" name="category" id="category" onchange="this.form.submit()">
+                  <option value="" {{#unless category}}selected{{/unless}}>Todas las Categorías</option>
+                  {{#each categories}}
+                  <option value="{{this}}" {{#if (eq ../category this)}}selected{{/if}}>{{this}}</option>
+                  {{/each}}
+                </select>
+              </form>
+            </div>
       
-    {{#each docs}}
-    <div class="col-sm-4 mb-3 mb-sm-3">
-    <div class="card" style="width: 18rem;">
-        
-        <img src="./images/{{this.thumbnail}}" class="card-img-top" alt="Fissure in Sandstone"/>
+            <div class="container-fluid">
+              <div class="row">
+                {{#each docs}}
+                <div class="col-md-6 col-sm-6">
+                <div class="card" style="width: 18rem;">
+                    
+                    <img src="./images/{{this.thumbnail}}" class="card-img-top" alt="Fissure in Sandstone"/>
 
-      <div class="card-body">
-        <h5 class="card-title">{{this.title}}</h5>
+                  <div class="card-body">
+                    <h5 class="card-title">{{this.title}}</h5>
 
-        <p class="card-text">
-          Precio: ${{this.price}} <br />
-          Stock: {{this.stock}}
-        </p>
+                    <p class="card-text">
+                      Precio: ${{this.price}} <br />
+                      Stock: {{this.stock}}
+                    </p>
 
-        <div class="card-footer">
-          <!--<a href="#!" class="btn btn-primary" data-mdb-ripple-init>Button</a>
-          <a href="#" class="card-link">Card link</a>
-          <a href="#" class="card-link">Another link</a>-->
-          
-          <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">    
-            <a href="/products/{{this.id}}" class="btn btn-primary" data-mdb-ripple-init>Ver Detalle</a>
-          {{#if this.status}}
-            <button class="btn btn-primary add-to-cart" data-product-id="{{this._id}}">Agregar al Carrito</button>
-          {{else}}
-            <button class="invisible">Espacio</button>
-          {{/if}}
-        </div>
-        </div>
-      </div>
-    </div>
-    </div>
-    {{/each}}
-    
+                    <div class="card-footer">
+                      <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">    
+                        <a href="/products/{{this.id}}" class="btn btn-primary" data-mdb-ripple-init>Ver Detalle</a>
+                      {{#if this.status}}
+                        <button class="btn btn-primary add-to-cart" data-product-id="{{this.id}}" data-product-quantity="{{this.quantity}}">Agregar al Carrito</button>
+                      {{else}}
+                        <button class="invisible">Espacio</button>
+                      {{/if}}
+                    </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+                {{/each}}
+              </div>
+
+            </div>
     </div>
   </div>
-</div>
+  <div class="col-md-4">
+            <h2>Carrito</h2>
+            <div id="cart" class="col-md-12 mt-3">
+              <ul class="list-group" id="cart-items"><!-- Lista de productos en el carrito--></ul>
+              <p id="empty-cart" style="display: none;">No products in cart</p>
+              <button class="btn btn-danger mt-3" onclick="clearCart()">Clear Cart</button>
+            </div>
+        </div>
 
-<div class="container">
+  </div>
+
+<div class="container justify-content-center mt-3">
+   <div class="row ">
+      <div class="col-md-12 justify-content-center">
   <nav aria-label="Page navigation example">
-    <ul class="pagination">
+    <ul class="pagination ">
       {{#if hasPrevPage}}
       <li class="page-item"><a class="page-link" href={{prevLink}}>Anterior</a></li>
       {{else}}
@@ -97,6 +107,9 @@
   <h3>No hay productos para mostrar</h3>
   <a href="/" class="center"><button>Volver a la tienda</button></a>
 {{/if}}
+  </div>
+</div>
 
-<script src="/node_modules/socket.io/socket.io.js"></script>
-<script src="../public/js/realTimeProducts.js"></script>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTimeProducts.js"></script>
