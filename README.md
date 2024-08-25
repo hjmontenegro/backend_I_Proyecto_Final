@@ -32,7 +32,7 @@ Servicio Rest CRUD Products y Carts.
 ![Post Products](/pruebas_imagen/Post_Cart_add.jpg)
 
 ### Put Producto en Carts
-![Post Products](/pruebas_imagen/Put_Cart_add.jpg)
+![Put Products](/pruebas_imagen/Post_productos_add.jpg)
 
 
 ### Todos los productos - Paginado
