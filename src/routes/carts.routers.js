@@ -68,14 +68,14 @@ router.put('/:cid/product/:pid', async (req, res) => {
             if (productBuscado) 
             {
               
-                const productCart = cartBuscado.products.find(p => p.product && p.product.toString() === idProducto);
+                const productCart = cartBuscado.products.find(p => p.product.toString() === productBuscado._id.toString());
 
                 if (productCart) {
         
                     productCart.quantity += 1; 
         
                 } else {
-                    cartBuscado.products.push({ product: idProducto, quantity: 1 });
+                    cartBuscado.products.push({ product: productBuscado._id, quantity: 1 });
                 }
         
                 await cartBuscado.save();
@@ -112,11 +112,11 @@ router.delete('/:cid/product/:pid', async (req, res) => {
         { 
             if (productBuscado) 
             { 
-                const productCartBuscado = cartBuscado.products.find(p => p.product && p.product.toString() === idProducto);
+                const productCart = cartBuscado.products.find(p => p.product.toString() === productBuscado._id.toString());
 
-                if (productCartBuscado) {
+                if (productCart) {
                     
-                    await cartsModel.findOne({ id: idCart }).updateMany({}, { $pull: { products: { product: req.params.pid } } });
+                    await cartsModel.findOne({ id: idCart }).updateMany({}, { $pull: { products: { product: productBuscado._id } } });
 
                     res.status(200).json({
                         msg: `Se elimiena el producto del Carrito`,
@@ -151,18 +151,11 @@ router.delete('/:cid', async (req, res) => {
 
         if (cartBuscado) 
         { 
-
-
-                    
-                    await cartsModel.findOne({ id: idCart }).updateMany({}, { $set: { products: [] } });
-
-                    res.status(200).json({
-                        msg: `Se elimiena todos los productos del Carrito`,
-                       // deletedProductCart
-                    });
-        
-  
-
+            await cartsModel.findOne({ id: idCart }).updateMany({}, { $set: { products: [] } });
+                res.status(200).json({
+                    msg: `Se elimiena todos los productos del Carrito`,
+                    // deletedProductCart
+                });
         } else {
             res.status(404).json({ error: 'Carrito no encontrado' });
         }
