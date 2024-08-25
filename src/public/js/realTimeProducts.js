@@ -29,7 +29,7 @@ function updateCartList(cart) {
                       <strong>Quantity:</strong> <span id="cart-quantity-${product._id}">${item.quantity}</span>
                   </div>
                   <div>
-                      <button class="btn btn-sm btn-danger" onclick="promptRemoveFromCart('${product._id}')">Remove</button>
+                      <button class="btn btn-sm btn-danger" onclick="RemoveFromCart('${product.id}')">Remove</button>
                   </div>
               </div>`;
           cartList.appendChild(cartItem);
@@ -64,6 +64,29 @@ fetch(`/api/carts/1/product/${productId}`, {
 .catch(err => console.error('Error adding product to cart:', err));
 };
 
+const RemoveFromCart = async (productId) => {
+  fetch(`/api/carts/1/product/${productId}`, {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  })
+  .then(response => response.json())
+  .then(cart => {
+      console.log('Product added to cart:', cart);
+      //socket.emit('cartUpdated', cart);
+      fetch('/api/carts/1')
+        .then(response => response.json())
+        .then(cart => {
+            if (cart) {
+                updateCartList(cart);
+            } else {
+                updateCartList({ products: [] });
+            }
+        })
+  })
+  .catch(err => console.error('Error adding product to cart:', err));
+  };
 
 
 socket.on('cartUpdated', (cart) => {

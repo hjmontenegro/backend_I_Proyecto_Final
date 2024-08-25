@@ -124,7 +124,9 @@ router.delete('/:cid/product/:pid', async (req, res) => {
                 if (productCart) {
                     
                     await cartsModel.findOne({ id: idCart }).updateMany({}, { $pull: { products: { product: productBuscado._id } } });
+                    productBuscado.stock += productCart.quantity;
 
+                    productBuscado.save();
                     res.status(200).json({
                         msg: `Se elimiena el producto del Carrito`,
                        // deletedProductCart
