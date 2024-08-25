@@ -93,7 +93,7 @@ const RemoveFromCart = async (productId, cantidadAcumulada) => {
 
             elemento.innerHTML = "Stock: " + ( Number(elemento.dataset.stock) + Number(cantidadAcumulada)).toString();
 
-            elemento.dataset.stock += Number(cantidadAcumulada)
+            elemento.dataset.stock = Number(elemento.dataset.stock) +  Number(cantidadAcumulada)
           })
   })
   .catch(err => console.error('Error adding product to cart:', err));
