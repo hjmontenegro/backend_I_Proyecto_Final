@@ -34,6 +34,11 @@ Servicio Rest CRUD Products y Carts.
 ### Put Producto en Carts
 ![Put Products](/pruebas_imagen/Post_productos_add.jpg)
 
+### Delete Producto del Carts
+![Delete Products](/pruebas_imagen/delete_producto_carts.jpg)
+
+### Delete Productos del Carts
+![Delete Products](/pruebas_imagen/delete_productos_carts.jpg)
 
 ### Todos los productos - Paginado
 ![home.handlebar](/pruebas_imagen/todos.jpg)

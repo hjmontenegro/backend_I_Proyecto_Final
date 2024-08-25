@@ -66,10 +66,7 @@ router.put('/:cid/product/:pid', async (req, res) => {
         if (cartBuscado) 
         { 
             if (productBuscado) 
-            { 
-                const updateData = {
-                    
-                };
+            {
               
                 const productCart = cartBuscado.products.find(p => p.product && p.product.toString() === idProducto);
 
@@ -100,4 +97,78 @@ router.put('/:cid/product/:pid', async (req, res) => {
     }
 });
 
+
+router.delete('/:cid/product/:pid', async (req, res) => {
+    
+    try {  
+
+        const idCart = req.params.cid;
+        const idProducto = req.params.pid;
+
+        const cartBuscado = await cartsModel.findOne({ id: idCart });
+        const productBuscado = await productsModel.findOne({ id: idProducto });        
+
+        if (cartBuscado) 
+        { 
+            if (productBuscado) 
+            { 
+                const productCartBuscado = cartBuscado.products.find(p => p.product && p.product.toString() === idProducto);
+
+                if (productCartBuscado) {
+                    
+                    await cartsModel.findOne({ id: idCart }).updateMany({}, { $pull: { products: { product: req.params.pid } } });
+
+                    res.status(200).json({
+                        msg: `Se elimiena el producto del Carrito`,
+                       // deletedProductCart
+                    });
+        
+                } else {
+                    res.status(404).json({ error: 'Producto a eliminar no encontrado' });
+                }
+        
+                
+                
+            } else {
+                res.status(404).json({ error: 'Producto a agregar inexistente' });
+            }   
+        } else {
+            res.status(404).json({ error: 'Carrito no encontrado' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error: Al Eliminar un producto al Carrito." });
+    }
+});
+
+router.delete('/:cid', async (req, res) => {
+    
+    try {  
+
+        const idCart = req.params.cid;
+
+        const cartBuscado = await cartsModel.findOne({ id: idCart });
+
+        if (cartBuscado) 
+        { 
+
+
+                    
+                    await cartsModel.findOne({ id: idCart }).updateMany({}, { $set: { products: [] } });
+
+                    res.status(200).json({
+                        msg: `Se elimiena todos los productos del Carrito`,
+                       // deletedProductCart
+                    });
+        
+  
+
+        } else {
+            res.status(404).json({ error: 'Carrito no encontrado' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error: Al Eliminar un producto al Carrito." });
+    }
+});
 export default router
