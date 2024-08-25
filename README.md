@@ -48,3 +48,6 @@ Servicio Rest CRUD Products y Carts.
 
 ### rproducto individual
 ![realtimeproductsmandado](/pruebas_imagen/productoindividual.jpg)
+
+### Carrito - refresca
+![carrito](/pruebas_imagen/carrito.jpg)
