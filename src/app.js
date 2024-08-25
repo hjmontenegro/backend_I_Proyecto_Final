@@ -79,5 +79,10 @@ socketServer.on('connection', socket => {
       console.log('Product data received:', data);
       socketServer.emit('productData', data);
     });
+
+    socket.on('cartUpdated', data => {
+      console.log('Product data received:', data);
+      socketServer.emit('cartUpdated', data);
+    });
 });
 

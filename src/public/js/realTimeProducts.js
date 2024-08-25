@@ -11,8 +11,6 @@ function updateCartList(cart) {
   }
   cartList.innerHTML = ''; // Limpiar lista de carritos
 
-  console.log("Armando carrito" + cart.products);
-
   if (!cart || !cart.products || cart.products.length === 0) {
       emptyCartMessage.style.display = 'block';
   } else {
@@ -26,10 +24,10 @@ function updateCartList(cart) {
               <div class="d-flex justify-content-between align-items-center">
                   <div>
                       <strong>Title:</strong> ${product.title || 'undefined'} <br>
-                      <strong>Quantity:</strong> <span id="cart-quantity-${product._id}">${item.quantity}</span>
+                      <strong>Quantity:</strong> <span id="cart-quantity-${product.id}">${item.quantity}</span>
                   </div>
                   <div>
-                      <button class="btn btn-sm btn-danger" onclick="RemoveFromCart('${product.id}')">Remove</button>
+                      <button class="btn btn-sm btn-danger" onclick="RemoveFromCart('${product.id}', '${item.quantity}')">Remove</button>
                   </div>
               </div>`;
           cartList.appendChild(cartItem);
@@ -41,6 +39,9 @@ function updateCartList(cart) {
 
 // Función para agregar un producto al carrito
 const addToCart = async (productId) => {
+
+
+
 fetch(`/api/carts/1/product/${productId}`, {
     method: 'PUT',
     headers: {
@@ -54,17 +55,22 @@ fetch(`/api/carts/1/product/${productId}`, {
     fetch('/api/carts/1')
       .then(response => response.json())
       .then(cart => {
+
           if (cart) {
               updateCartList(cart);
           } else {
               updateCartList({ products: [] });
           }
+          let elemento = document.getElementById("card-text-stock-" + productId );
+          elemento.innerHTML = "Stock: " + ( Number(elemento.dataset.stock) - 1).toString();
+
+          elemento.dataset.stock -= 1;
       })
 })
 .catch(err => console.error('Error adding product to cart:', err));
 };
 
-const RemoveFromCart = async (productId) => {
+const RemoveFromCart = async (productId, cantidadAcumulada) => {
   fetch(`/api/carts/1/product/${productId}`, {
       method: 'DELETE',
       headers: {
@@ -83,7 +89,12 @@ const RemoveFromCart = async (productId) => {
             } else {
                 updateCartList({ products: [] });
             }
-        })
+            let elemento = document.getElementById("card-text-stock-" + productId );
+
+            elemento.innerHTML = "Stock: " + ( Number(elemento.dataset.stock) + Number(cantidadAcumulada)).toString();
+
+            elemento.dataset.stock += Number(cantidadAcumulada)
+          })
   })
   .catch(err => console.error('Error adding product to cart:', err));
   };
@@ -146,7 +157,6 @@ socket.on("Product Update", (updatedProduct) => {
   }
 });
 
-//Alertas
 function promptAddToCart(productId) {
   return addToCart(productId, parseInt(productId));
 }
