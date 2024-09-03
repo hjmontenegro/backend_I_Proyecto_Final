@@ -3,12 +3,15 @@ import mongoose from "mongoose";
 import handlebars from 'express-handlebars'
 import __dirname from './utils/utils.js'
 
+import _connect from './public/js/_connect.js';
+
 import homeRouter from './routes/home.routers.js'
 import productsRouter from './routes/products.routers.js'
 import cartsRouter from './routes/carts.routers.js'
 
 import { Server } from 'socket.io';
 import { helpers } from "./utils/utils.js";
+import { config } from "dotenv";
 
 import Swal from 'sweetalert2';
 
@@ -18,17 +21,11 @@ const PORT = 8080
 app.use(express.json())
 app.use(express.urlencoded({ extended : true }))
 
-//Conexión a la base de datos
-mongoose
-  .connect(
-    "mongodb+srv://hjmontenegro:gtFwcvQwwQyvxcFx@cluster0.ruii4i2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  )
-  .then(() => {
-    console.log("Conectado a la Base de Datos.");
-  })
-  .catch((error) =>
-    console.error("Error: No se pudo conectar con la base de datos", error)
-  );
+// configurar dotenv
+config({path: '.env'});
+
+// mongo connection
+_connect();
 
   // Crear instancia de Handlebars con helpers personalizados
 const hbs = handlebars.create({
